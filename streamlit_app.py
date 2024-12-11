@@ -26,21 +26,27 @@ url = st.text_input("URL", "https://")
 
 if st.button("Generate QR Code"):
     if url and url.startswith("http"):
-        # Generate QR code
-        qr_code_image = generate_qr_code(url)
-        
-        # Display QR code
-        st.image(qr_code_image, caption="Generated QR Code", use_column_width=True)
-        
-        # Provide download link
-        buf = BytesIO()
-        qr_code_image.save(buf, format="PNG")
-        byte_data = buf.getvalue()
-        st.download_button(
-            label="Download QR Code",
-            data=byte_data,
-            file_name="qr_code.png",
-            mime="image/png"
-        )
+        try:
+            # Generate QR code
+            qr_code_image = generate_qr_code(url)
+
+            # Convert QR code image to a format compatible with Streamlit
+            buf = BytesIO()
+            qr_code_image.save(buf, format="PNG")
+            buf.seek(0)
+
+            # Display QR code
+            st.image(buf, caption="Generated QR Code", use_column_width=True)
+
+            # Provide download link
+            byte_data = buf.getvalue()
+            st.download_button(
+                label="Download QR Code",
+                data=byte_data,
+                file_name="qr_code.png",
+                mime="image/png"
+            )
+        except Exception as e:
+            st.error(f"An error occurred while generating the QR code: {e}")
     else:
         st.error("Please enter a valid URL starting with http or https.")
