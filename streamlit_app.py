@@ -1,56 +1,52 @@
-import streamlit as st
-
-st.title("🎈 My new app")
-st.write(
-    "Let's start building! For help and inspiration, head over to [docs.streamlit.io](https://docs.streamlit.io/)."
-)
-
-import streamlit as st
+mport streamlit as st
 import qrcode
-from io import BytesIO
 from PIL import Image
+import io
 
-def generate_qrcode(data):
-    qr = qrcode.QRCode(
-        version=1,  # controls the size of the QR Code
-        error_correction=qrcode.constants.ERROR_CORRECT_H,
-        box_size=10,
-        border=4,
-    )
-    qr.add_data(data)
-    qr.make(fit=True)
-    img = qr.make_image(fill_color="black", back_color="white")
-    return img
+def generate_qr_code(text, fill_color="black", back_color="white"):
+qr = qrcode.QRCode(
+version=1,
+error_correction=qrcode.constants.ERROR_CORRECT_L,
+box_size=10,
+border=4,
+)
+qr.add_data(text)
+qr.make(fit=True)
+qr_image = qr.make_image(fill_color=fill_color, back_color=back_color)
+return qr_image
+def main():
+st.title("QR 코드 생성기")
+# 사용자 입력
+text_input = st.text_input("QR 코드로 변환할 텍스트를 입력하세요:", "<https://www.example.com>")
 
-# Streamlit App Title
-st.title("QR Code Generator")
+# 색상 선택
+col1, col2 = st.columns(2)
+with col1:
+    fill_color = st.color_picker("QR 코드 색상", "#000000")
+with col2:
+    back_color = st.color_picker("배경 색상", "#FFFFFF")
 
-# Input Section
-st.header("Enter the text or URL to generate a QR Code")
-input_text = st.text_input("Text or URL", placeholder="Type your text or URL here...")
+if st.button("QR 코드 생성"):
+    if text_input:
+        # QR 코드 생성
+        qr_image = generate_qr_code(text_input, fill_color, back_color)
 
-# Generate Button
-if st.button("Generate QR Code"):
-    if input_text:
-        qr_image = generate_qrcode(input_text)
-        
-        # Save QR Code to a BytesIO object
-        buffer = BytesIO()
-        qr_image.save(buffer, format="PNG")
-        buffer.seek(0)
+        # 이미지를 바이트로 변환
+        img_byte_arr = io.BytesIO()
+        qr_image.save(img_byte_arr, format='PNG')
+        img_byte_arr = img_byte_arr.getvalue()
 
-        # Display QR Code
-        st.image(qr_image, caption="Your QR Code", use_column_width=True)
+        # QR 코드 표시
+        st.image(img_byte_arr, caption="생성된 QR 코드")
 
-        # Add a download button
+        # 다운로드 버튼
         st.download_button(
-            label="Download QR Code",
-            data=buffer,
-            file_name="qrcode.png",
+            label="QR 코드 다운로드",
+            data=img_byte_arr,
+            file_name="qr_code.png",
             mime="image/png"
         )
     else:
-        st.warning("Please enter some text or a URL before generating the QR Code.")
-
-# Footer
-st.markdown("Made with ❤️ using Streamlit")
+        st.warning("텍스트를 입력해주세요.")
+        if **name** == "**main**":
+main()
